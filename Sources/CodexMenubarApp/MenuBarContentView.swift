@@ -248,10 +248,10 @@ struct MenuBarContentView: View {
     private func confirmSwitch(processCount: Int) -> Bool {
         let alert = NSAlert()
         alert.alertStyle = .warning
-        alert.messageText = "Codex is currently running"
-        alert.informativeText = "Continue to kill them, switch account, and relaunch Codex?"
+        alert.messageText = "Switch Account?"
+        alert.informativeText = "Codex is active. Switching accounts will stop Codex and relaunch it."
         alert.icon = alertIcon()
-        alert.addButton(withTitle: "Continue")
+        alert.addButton(withTitle: "Switch and Relaunch")
         alert.addButton(withTitle: "Cancel")
         return alert.runModal() == .alertFirstButtonReturn
     }
