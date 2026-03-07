@@ -17,10 +17,11 @@
 !features/**
 
 # 4. Block some directories and files
+*.git
 .build/
 .swiftpm/
 .venv/
 .pytest_cache/
 **/__pycache__/
 *.pyc
-*.git
+**/.DS_Store
