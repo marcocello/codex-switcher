@@ -66,25 +66,46 @@ struct MenuBarContentView: View {
                     .padding(.top, 10)
             }
 
-            HStack(spacing: 8) {
-                Button("Add Account") {
+            VStack(spacing: 0) {
+                Button {
                     Task {
                         await appState.addAccountViaOAuth()
                     }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "person.crop.circle.badge.plus")
+                        Text("Add Account")
+                        Spacer(minLength: 0)
+                    }
+                    .foregroundColor(labelColor)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 4)
+                    .contentShape(Rectangle())
+                    .trayInteractiveRowChrome()
                 }
-                .buttonStyle(.borderless)
-                .hoverCursor(.pointingHand)
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-                Spacer()
-
-                Button("Quit") {
+                Button {
                     onQuit()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "power")
+                        Text("Quit")
+                        Spacer(minLength: 0)
+                    }
+                    .foregroundColor(labelColor)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 4)
+                    .contentShape(Rectangle())
+                    .trayInteractiveRowChrome()
                 }
-                .buttonStyle(.borderless)
-                .hoverCursor(.pointingHand)
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 14)
-            .padding(.vertical, 10)
+            .padding(.vertical, 8)
         }
         .frame(width: 280)
         .environment(\.controlActiveState, .key)
@@ -93,7 +114,35 @@ struct MenuBarContentView: View {
     @ViewBuilder
     private func accountBlock(_ account: Account) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
+            ZStack(alignment: .trailing) {
+                Button {
+                    Task {
+                        await handleSwitch(accountID: account.id)
+                    }
+                } label: {
+                    Color.clear
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(.trailing, 30)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                HStack(spacing: 8) {
+                    Image(systemName: account.isActive ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(secondaryColor)
+                        .frame(width: 16, alignment: .leading)
+                    Text(account.name)
+                        .font(.headline.weight(account.isActive ? .semibold : .regular))
+                        .foregroundColor(labelColor)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    Spacer(minLength: 0)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.trailing, 30)
+                .allowsHitTesting(false)
+
                 Menu {
                     Button("Rename...") {
                         Task {
@@ -107,39 +156,16 @@ struct MenuBarContentView: View {
                         }
                     }
                 } label: {
-                    Image(systemName: "chevron.down")
+                    Image(systemName: "ellipsis")
                         .font(.system(size: 14, weight: .regular))
                         .foregroundColor(secondaryColor)
+                        .frame(width: 22, height: 22)
                 }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
-                .frame(width: 16, alignment: .leading)
-                .fixedSize()
-                .hoverCursor(.pointingHand)
-
-                Button {
-                    Task {
-                        await handleSwitch(accountID: account.id)
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: account.isActive ? "checkmark.circle.fill" : "circle")
-                            .foregroundColor(secondaryColor)
-                        Text(account.name)
-                            .font(.headline.weight(account.isActive ? .semibold : .regular))
-                            .foregroundColor(labelColor)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                        Spacer(minLength: 0)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 6)
-                }
-                .buttonStyle(.plain)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-                .hoverCursor(.pointingHand)
+                .frame(width: 22, height: 22, alignment: .center)
             }
+            .trayInteractiveRowChrome()
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(accountMetadataLine(for: account))
@@ -223,7 +249,7 @@ struct MenuBarContentView: View {
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = "Codex is currently running"
-        alert.informativeText = "\(processCount) Codex process(es) are running. Continue to kill them, switch account, and relaunch Codex?"
+        alert.informativeText = "Continue to kill them, switch account, and relaunch Codex?"
         alert.icon = alertIcon()
         alert.addButton(withTitle: "Continue")
         alert.addButton(withTitle: "Cancel")
@@ -330,22 +356,37 @@ struct MenuBarContentView: View {
 
 }
 
-private struct HoverCursorModifier: ViewModifier {
-    let cursor: NSCursor
+private struct HoverHighlightModifier: ViewModifier {
+    let cornerRadius: CGFloat
+    let horizontalExpand: CGFloat
+    @State private var isHovering = false
 
     func body(content: Content) -> some View {
-        content.onHover { isHovering in
-            if isHovering {
-                cursor.push()
-            } else {
-                NSCursor.pop()
-            }
-        }
+        content
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(
+                        isHovering
+                            ? Color(nsColor: NSColor(white: 0.0, alpha: 0.10))
+                            : Color.clear
+                    )
+                    .padding(.horizontal, -horizontalExpand)
+            )
+            .animation(.easeOut(duration: 0.12), value: isHovering)
+            .onHover { isHovering = $0 }
     }
 }
 
 private extension View {
-    func hoverCursor(_ cursor: NSCursor) -> some View {
-        modifier(HoverCursorModifier(cursor: cursor))
+    func trayInteractiveRowChrome() -> some View {
+        self
+            .padding(.vertical, 3)
+            .padding(.horizontal, 2)
+            .contentShape(Rectangle())
+            .hoverHighlight(cornerRadius: 8, horizontalExpand: 8)
+    }
+
+    func hoverHighlight(cornerRadius: CGFloat = 6, horizontalExpand: CGFloat = 0) -> some View {
+        modifier(HoverHighlightModifier(cornerRadius: cornerRadius, horizontalExpand: horizontalExpand))
     }
 }
