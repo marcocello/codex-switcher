@@ -14,7 +14,7 @@ public struct FilePaths: Sendable {
         let appSupport = home
             .appendingPathComponent("Library", isDirectory: true)
             .appendingPathComponent("Application Support", isDirectory: true)
-            .appendingPathComponent("CodexMenubar", isDirectory: true)
+            .appendingPathComponent("CodexSwitcher", isDirectory: true)
         let codexDir = home
             .appendingPathComponent(".codex", isDirectory: true)
         return FilePaths(

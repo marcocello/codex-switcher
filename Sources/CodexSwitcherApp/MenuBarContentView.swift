@@ -1,9 +1,9 @@
 import AppKit
-import CodexMenubarCore
+import CodexSwitcherCore
 import SwiftUI
 
 struct MenuBarContentView: View {
-    @ObservedObject var appState: MenubarAppState
+    @ObservedObject var appState: SwitcherAppState
     let onQuit: () -> Void
 
     private var labelColor: Color {
@@ -307,7 +307,7 @@ struct MenuBarContentView: View {
     }
 
     private func alertIcon() -> NSImage? {
-        NSImage(systemSymbolName: "lightswitch.on", accessibilityDescription: "Codex Account Switcher")
+        NSImage(systemSymbolName: "lightswitch.on", accessibilityDescription: "Codex Switcher")
     }
 
     private func accountMetadataLine(for account: Account) -> String {

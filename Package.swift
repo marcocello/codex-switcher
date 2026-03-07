@@ -2,37 +2,34 @@
 import PackageDescription
 
 let package = Package(
-    name: "CodexMenubar",
+    name: "codex-switcher",
     platforms: [
         .macOS(.v13)
     ],
     products: [
-        .library(name: "CodexMenubarCore", targets: ["CodexMenubarCore"]),
-        .executable(name: "CodexMenubarApp", targets: ["CodexMenubarApp"])
+        .library(name: "CodexSwitcherCore", targets: ["CodexSwitcherCore"]),
+        .executable(name: "codex-switcher", targets: ["CodexSwitcherApp"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-testing.git", from: "0.8.0")
     ],
     targets: [
         .target(
-            name: "CodexMenubarCore",
-            path: "Sources/CodexMenubarCore"
+            name: "CodexSwitcherCore",
+            path: "Sources/CodexSwitcherCore"
         ),
         .executableTarget(
-            name: "CodexMenubarApp",
-            dependencies: ["CodexMenubarCore"],
-            path: "Sources/CodexMenubarApp",
-            resources: [
-                .process("Resources")
-            ]
+            name: "CodexSwitcherApp",
+            dependencies: ["CodexSwitcherCore"],
+            path: "Sources/CodexSwitcherApp"
         ),
         .testTarget(
-            name: "CodexMenubarCoreTests",
+            name: "CodexSwitcherCoreTests",
             dependencies: [
-                "CodexMenubarCore",
+                "CodexSwitcherCore",
                 .product(name: "Testing", package: "swift-testing")
             ],
-            path: "Tests/CodexMenubarCoreTests"
+            path: "Tests/CodexSwitcherCoreTests"
         )
     ]
 )

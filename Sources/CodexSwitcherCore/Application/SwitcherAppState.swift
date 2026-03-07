@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 @MainActor
-public final class MenubarAppState: ObservableObject {
+public final class SwitcherAppState: ObservableObject {
     @Published public private(set) var accounts: [Account] = []
     @Published public private(set) var usageByAccountID: [String: UsageSnapshot] = [:]
     @Published public var lastErrorMessage: String?

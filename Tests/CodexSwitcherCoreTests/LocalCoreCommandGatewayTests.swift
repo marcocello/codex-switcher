@@ -1,4 +1,4 @@
-import CodexMenubarCore
+import CodexSwitcherCore
 import Foundation
 import Testing
 

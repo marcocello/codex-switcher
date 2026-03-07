@@ -1,14 +1,14 @@
 import AppKit
-import CodexMenubarCore
+import CodexSwitcherCore
 import SwiftUI
 
 @MainActor
 final class StatusBarController: NSObject {
-    private let appState: MenubarAppState
+    private let appState: SwitcherAppState
     private let statusItem: NSStatusItem
     private let popover: NSPopover
 
-    init(appState: MenubarAppState) {
+    init(appState: SwitcherAppState) {
         self.appState = appState
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.popover = NSPopover()
@@ -27,7 +27,7 @@ final class StatusBarController: NSObject {
 
         button.image = NSImage(
             systemSymbolName: "lightswitch.on",
-            accessibilityDescription: "Codex Account Switcher"
+            accessibilityDescription: "Codex Switcher"
         )
         button.action = #selector(togglePopover(_:))
         button.target = self

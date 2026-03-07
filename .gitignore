@@ -11,6 +11,8 @@
 !Package.swift
 !Package.resolved
 !CodexSwitcher-Info.plist
+!README.md
+!scripts/**
 !Sources/**
 !Tests/**
 !docs/**

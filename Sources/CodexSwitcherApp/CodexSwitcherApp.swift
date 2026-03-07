@@ -1,5 +1,5 @@
 import AppKit
-import CodexMenubarCore
+import CodexSwitcherCore
 import SwiftUI
 
 @MainActor
@@ -16,16 +16,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 @MainActor
 final class AppRuntime {
     static let shared = AppRuntime()
-    let appState: MenubarAppState
+    let appState: SwitcherAppState
 
     private init() {
         let gateway = LocalCoreCommandGateway.defaultGateway()
-        appState = MenubarAppState(gateway: gateway)
+        appState = SwitcherAppState(gateway: gateway)
     }
 }
 
 @main
-struct CodexMenubarApp: App {
+struct CodexSwitcherApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {

@@ -1,4 +1,4 @@
-@testable import CodexMenubarCore
+@testable import CodexSwitcherCore
 import Testing
 
 @Test("Workspace identifier prefers default organization id")
