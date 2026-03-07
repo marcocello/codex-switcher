@@ -1,0 +1,26 @@
+## From https://jasonstitt.com/gitignore-whitelisting-patterns
+
+# 1. Ignore everything
+*
+
+# 2. But descend into directories
+!*/
+
+# 3. Allow specific files and file extensions
+!.gitignore
+!Package.swift
+!Package.resolved
+!CodexMenubarApp-Info.plist
+!Sources/**
+!Tests/**
+!docs/**
+!features/**
+
+# 4. Block some directories and files
+.build/
+.swiftpm/
+.venv/
+.pytest_cache/
+**/__pycache__/
+*.pyc
+*.git
