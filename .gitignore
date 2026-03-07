@@ -17,6 +17,7 @@
 !Tests/**
 !docs/**
 !features/**
+!*.png
 
 # 4. Block some directories and files
 *.git
