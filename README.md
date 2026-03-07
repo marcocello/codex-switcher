@@ -1,5 +1,7 @@
 # Codex Switcher
 
+<img src="codex-switcher-example.png" alt="Codex Switcher example" width="300" />
+
 Codex Switcher is a lightweight macOS menubar app to manage multiple Codex accounts without leaving your current workflow.
 
 What it does:
