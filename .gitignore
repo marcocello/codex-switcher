@@ -10,7 +10,7 @@
 !.gitignore
 !Package.swift
 !Package.resolved
-!CodexMenubarApp-Info.plist
+!CodexSwitcher-Info.plist
 !Sources/**
 !Tests/**
 !docs/**
