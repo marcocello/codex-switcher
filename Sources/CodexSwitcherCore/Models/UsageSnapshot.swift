@@ -34,7 +34,7 @@ public struct UsageSnapshot: Codable, Equatable, Sendable {
             primaryUsedPercent: 0,
             primaryResetsAt: Calendar.current.nextDate(after: now, matching: DateComponents(hour: 0, minute: 0, second: 0), matchingPolicy: .nextTime) ?? now,
             secondaryUsedPercent: 0,
-            secondaryResetsAt: Calendar.current.date(byAdding: .day, value: 7, to: now) ?? now,
+            secondaryResetsAt: Calendar.current.date(byAdding: .day, value: 14, to: now) ?? now,
             planType: planType,
             error: nil
         )

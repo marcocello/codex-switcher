@@ -2,7 +2,7 @@ import CodexSwitcherCore
 import Foundation
 import Testing
 
-@Test("Usage fetcher maps ChatGPT usage payload to daily and weekly fields")
+@Test("Usage fetcher maps ChatGPT usage payload to primary and secondary fields")
 func usageFetcherMapsPayload() async {
     let json = """
     {
@@ -100,4 +100,14 @@ func usageFetcherRejectsAPIKeyStats() async {
     let usage = await fetcher.fetchUsage(for: account, credential: credential)
 
     #expect(usage.error == "Usage info not available for API key accounts")
+}
+
+@Test("Empty usage snapshot defaults secondary reset to a two-week window")
+func usageSnapshotEmptyDefaultsSecondaryResetToTwoWeeks() {
+    let now = Date()
+    let usage = UsageSnapshot.empty(accountID: "acc-3", planType: nil)
+    let daysUntilSecondaryReset = usage.secondaryResetsAt.timeIntervalSince(now) / 86_400
+
+    #expect(daysUntilSecondaryReset > 13)
+    #expect(daysUntilSecondaryReset < 15)
 }
