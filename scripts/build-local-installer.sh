@@ -4,12 +4,22 @@ set -euo pipefail
 APP_NAME="Codex Switcher"
 EXECUTABLE_NAME="codex-switcher"
 BUNDLE_ID="com.codex.switcher"
-VERSION="1.0.0"
+DEFAULT_VERSION="1.0.0"
 MIN_MACOS="13.0"
 SYMBOL_NAME="lightswitch.on"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+VERSION_FILE="${REPO_ROOT}/VERSION"
+
+if [[ -f "${VERSION_FILE}" ]]; then
+  VERSION="$(tr -d '[:space:]' < "${VERSION_FILE}")"
+fi
+VERSION="${VERSION:-${DEFAULT_VERSION}}"
+BUILD_DATE="$(git -C "${REPO_ROOT}" show -s --date=format:%Y-%m-%d --format=%cd HEAD 2>/dev/null || true)"
+BUILD_SHORT_HASH="$(git -C "${REPO_ROOT}" rev-parse --short=7 HEAD 2>/dev/null || true)"
+BUILD_DATE="${BUILD_DATE:-unknown-date}"
+BUILD_SHORT_HASH="${BUILD_SHORT_HASH:-unknownhash}"
 
 DIST_DIR="${REPO_ROOT}/dist"
 STAGE_DIR="${DIST_DIR}/dmg-staging"
@@ -131,6 +141,10 @@ cat > "${CONTENTS_DIR}/Info.plist" <<PLIST
     <string>1</string>
     <key>CFBundleShortVersionString</key>
     <string>${VERSION}</string>
+    <key>CodexBuildDate</key>
+    <string>${BUILD_DATE}</string>
+    <key>CodexBuildShortHash</key>
+    <string>${BUILD_SHORT_HASH}</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleExecutable</key>
