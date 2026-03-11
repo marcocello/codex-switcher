@@ -19,6 +19,9 @@ cd cs
 open "dist/Codex Switcher.dmg"
 ```
 
+The tray shows build metadata as `YYYY-MM-DD <short-hash>`.  
+To set the bundle marketing version, update the root `VERSION` file before running the build script.
+
 Then drag `Codex Switcher.app` into `Applications`.
 
 Notes:

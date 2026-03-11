@@ -26,6 +26,10 @@ struct MenuBarContentView: View {
         Color(nsColor: NSColor(srgbRed: 0.63, green: 0.17, blue: 0.17, alpha: 1))
     }
 
+    private var trayVersionLabel: String {
+        AppVersionFormatter.trayLabelText(infoDictionary: Bundle.main.infoDictionary)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             GeometryReader { proxy in
@@ -102,6 +106,14 @@ struct MenuBarContentView: View {
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity, alignment: .leading)
+
+                Divider()
+                    .padding(.vertical, 6)
+
+                Text(trayVersionLabel)
+                    .font(.caption2)
+                    .foregroundColor(secondaryColor)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 14)
