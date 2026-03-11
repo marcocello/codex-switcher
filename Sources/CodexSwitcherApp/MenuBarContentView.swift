@@ -184,7 +184,7 @@ struct MenuBarContentView: View {
                 .padding(.bottom, 10)
 
                 usageBarLine(
-                    title: "Weekly",
+                    title: "2 weeks",
                     usedPercent: Int(min(max(usage.secondaryUsedPercent, 0), 100)),
                     resetAt: usage.secondaryResetsAt,
                     tint: usageColor(forUsedPercent: usage.secondaryUsedPercent)

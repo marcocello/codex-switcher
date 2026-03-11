@@ -6,7 +6,7 @@ Codex Switcher is a lightweight macOS menubar app to manage multiple Codex accou
 
 What it does:
 - Keeps your Codex accounts in one place.
-- Shows Daily and Weekly usage per account.
+- Shows Daily and 2-week usage per account.
 - Lets you switch account from the tray in one click.
 - If Codex is actively running, it asks for confirmation before switching, then stops/relaunches Codex safely.
 
