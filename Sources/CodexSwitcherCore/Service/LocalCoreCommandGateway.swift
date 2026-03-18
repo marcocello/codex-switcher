@@ -43,9 +43,13 @@ public final class LocalCoreCommandGateway: CoreCommandGateway, @unchecked Senda
         var state = try loadStateEnsuringWorkspaceIDs()
         var nextUsage = state.usageByAccountID
 
-        for record in state.records {
-            let usage = await usageFetcher.fetchUsage(for: record.account, credential: record.credential)
-            nextUsage[record.account.id] = usage
+        for index in state.records.indices {
+            let record = state.records[index]
+            let result = await usageFetcher.fetchUsage(for: record.account, credential: record.credential)
+            nextUsage[record.account.id] = result.usage
+            if let updatedCredential = result.updatedCredential {
+                state.records[index].credential = updatedCredential
+            }
         }
 
         state.usageByAccountID = nextUsage

@@ -170,6 +170,32 @@ func workspaceNameIsClearedWhenIdentifierMissing() async throws {
     #expect(store.state.records.first?.credential.workspaceName == nil)
 }
 
+@Test("Refresh usage persists refreshed credential from usage fetcher")
+func refreshUsagePersistsRefreshedCredential() async throws {
+    var active = makeAccountRecord(id: "A", name: "alpha")
+    active.credential.accessToken = "token-old"
+    active.credential.refreshToken = "refresh-old"
+
+    let store = InMemoryStore(
+        state: PersistedAccounts(records: [active], activeAccountID: "A", usageByAccountID: [:])
+    )
+    let usage = StubUsageFetcher { account, credential in
+        var updated = credential
+        updated.accessToken = "token-new"
+        updated.refreshToken = "refresh-new"
+        updated.refreshedAt = Date(timeIntervalSince1970: 123)
+        let snapshot = UsageSnapshot.empty(accountID: account.id, planType: account.planType)
+        return UsageFetchResult(usage: snapshot, updatedCredential: updated)
+    }
+    let gateway = makeGateway(store: store, usage: usage)
+
+    _ = try await gateway.refresh_all_accounts_usage()
+
+    #expect(store.state.records.first?.credential.accessToken == "token-new")
+    #expect(store.state.records.first?.credential.refreshToken == "refresh-new")
+    #expect(store.state.records.first?.credential.refreshedAt == Date(timeIntervalSince1970: 123))
+}
+
 private func makeGateway(
     store: InMemoryStore,
     oauth: StubOAuth = StubOAuth(info: OAuthAccountInfo(email: nil, workspaceName: nil, planType: nil, authMode: .chatGPT, accessToken: nil, refreshToken: nil, idToken: nil, externalAccountID: nil, apiKey: nil, rawAuthJSON: nil)),
@@ -280,8 +306,16 @@ private final class StubProcessManager: CodexProcessManaging, @unchecked Sendabl
 }
 
 private struct StubUsageFetcher: UsageFetching {
-    func fetchUsage(for account: Account, credential: AuthCredential) async -> UsageSnapshot {
-        UsageSnapshot.empty(accountID: account.id, planType: account.planType)
+    var handler: @Sendable (Account, AuthCredential) async -> UsageFetchResult
+
+    init(handler: @escaping @Sendable (Account, AuthCredential) async -> UsageFetchResult = { account, _ in
+        UsageFetchResult(usage: UsageSnapshot.empty(accountID: account.id, planType: account.planType))
+    }) {
+        self.handler = handler
+    }
+
+    func fetchUsage(for account: Account, credential: AuthCredential) async -> UsageFetchResult {
+        await handler(account, credential)
     }
 }
 
