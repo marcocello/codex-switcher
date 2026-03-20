@@ -30,130 +30,190 @@ struct MenuBarContentView: View {
         AppVersionFormatter.trayLabelText(infoDictionary: Bundle.main.infoDictionary)
     }
 
+    private var activeAccount: Account? {
+        appState.accounts.first(where: \.isActive)
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            GeometryReader { proxy in
+        VStack(alignment: .leading, spacing: 0) {
+            headerSection
+
+            Divider()
+                .padding(.vertical, 4)
+
+            GeometryReader { _ in
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: 0) {
                         if appState.accounts.isEmpty {
                             Text("No accounts yet")
+                                .font(.subheadline)
                                 .foregroundColor(secondaryColor)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 16)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 12)
                         } else {
                             ForEach(Array(appState.accounts.enumerated()), id: \.element.id) { index, account in
                                 accountBlock(account)
-                                    .frame(width: proxy.size.width, alignment: .leading)
                                 if index < appState.accounts.count - 1 {
                                     Divider()
-                                        .padding(.horizontal, 14)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 4)
                                 }
                             }
                         }
                     }
-                    .padding(.vertical, 8)
-                    .frame(width: proxy.size.width, alignment: .leading)
                 }
-                .frame(width: proxy.size.width)
             }
             .frame(maxWidth: .infinity)
-            .frame(maxHeight: 430)
+            .frame(maxHeight: 420)
 
             Divider()
+                .padding(.vertical, 4)
 
             if let lastErrorMessage = appState.lastErrorMessage {
                 Text(lastErrorMessage)
                     .font(.caption)
                     .foregroundColor(.red)
                     .lineLimit(2)
-                    .padding(.horizontal, 14)
-                    .padding(.top, 10)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 6)
             }
 
-            VStack(spacing: 0) {
-                Button {
-                    Task {
-                        await appState.addAccountViaOAuth()
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "person.crop.circle.badge.plus")
-                        Text("Add Account")
-                        Spacer(minLength: 0)
-                    }
-                    .foregroundColor(labelColor)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 4)
-                    .contentShape(Rectangle())
-                    .trayInteractiveRowChrome()
-                }
-                .buttonStyle(.plain)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                Button {
-                    onQuit()
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "power")
-                        Text("Quit")
-                        Spacer(minLength: 0)
-                    }
-                    .foregroundColor(labelColor)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 4)
-                    .contentShape(Rectangle())
-                    .trayInteractiveRowChrome()
-                }
-                .buttonStyle(.plain)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                Divider()
-                    .padding(.vertical, 6)
-
-                Text(trayVersionLabel)
-                    .font(.caption2)
-                    .foregroundColor(secondaryColor)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
+            actionButtonsSection
         }
-        .frame(width: 280)
+        .frame(width: 260)
         .environment(\.controlActiveState, .key)
+    }
+
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: "lightswitch.on")
+                    .foregroundColor(labelColor)
+                Text("Codex Switcher")
+                    .font(.headline)
+                    .foregroundColor(labelColor)
+                Spacer()
+            }
+
+            HStack(spacing: 0) {
+                Image(systemName: "person.2")
+                    .font(.caption)
+                    .foregroundColor(secondaryColor)
+                Text(" Accounts: \(appState.accounts.count)")
+                    .font(.caption)
+                    .foregroundColor(secondaryColor)
+                Spacer()
+                if let activeAccount {
+                    Text("Active: \(activeAccount.name)")
+                        .font(.caption)
+                        .foregroundColor(secondaryColor)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.top, 10)
+        .padding(.bottom, 6)
+    }
+
+    private var actionButtonsSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Button {
+                Task {
+                    await appState.refreshUsage()
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.clockwise")
+                    Text("Refresh Usage")
+                    Spacer(minLength: 0)
+                }
+                .foregroundColor(labelColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 4)
+                .contentShape(Rectangle())
+                .trayInteractiveRowChrome()
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button {
+                Task {
+                    await appState.addAccountViaOAuth()
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "person.crop.circle.badge.plus")
+                    Text("Add Account")
+                    Spacer(minLength: 0)
+                }
+                .foregroundColor(labelColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 4)
+                .contentShape(Rectangle())
+                .trayInteractiveRowChrome()
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Divider()
+                .padding(.vertical, 4)
+
+            Button {
+                onQuit()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "power")
+                    Text("Quit")
+                    Spacer(minLength: 0)
+                }
+                .foregroundColor(labelColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 4)
+                .contentShape(Rectangle())
+                .trayInteractiveRowChrome()
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text(trayVersionLabel)
+                .font(.caption2)
+                .foregroundColor(secondaryColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 6)
+        }
+        .padding(.horizontal, 12)
+        .padding(.bottom, 8)
     }
 
     @ViewBuilder
     private func accountBlock(_ account: Account) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ZStack(alignment: .trailing) {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
                 Button {
                     Task {
                         await handleSwitch(accountID: account.id)
                     }
                 } label: {
-                    Color.clear
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.trailing, 30)
-                        .contentShape(Rectangle())
+                    HStack(spacing: 8) {
+                        Image(systemName: account.isActive ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(account.isActive ? darkGreenUsageColor : secondaryColor)
+                            .frame(width: 16, alignment: .leading)
+                        Text(account.name)
+                            .font(.body.weight(account.isActive ? .semibold : .regular))
+                            .foregroundColor(labelColor)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 4)
+                    .contentShape(Rectangle())
+                    .trayInteractiveRowChrome()
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity, alignment: .leading)
-
-                HStack(spacing: 8) {
-                    Image(systemName: account.isActive ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(secondaryColor)
-                        .frame(width: 16, alignment: .leading)
-                    Text(account.name)
-                        .font(.headline.weight(account.isActive ? .semibold : .regular))
-                        .foregroundColor(labelColor)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                    Spacer(minLength: 0)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.trailing, 30)
-                .allowsHitTesting(false)
 
                 Menu {
                     Button("Rename...") {
@@ -169,15 +229,14 @@ struct MenuBarContentView: View {
                     }
                 } label: {
                     Image(systemName: "ellipsis")
-                        .font(.system(size: 14, weight: .regular))
+                        .font(.system(size: 13, weight: .regular))
                         .foregroundColor(secondaryColor)
-                        .frame(width: 22, height: 22)
+                        .frame(width: 20, height: 20)
                 }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
-                .frame(width: 22, height: 22, alignment: .center)
+                .frame(width: 20, alignment: .trailing)
             }
-            .trayInteractiveRowChrome()
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(accountMetadataLine(for: account))
@@ -188,15 +247,14 @@ struct MenuBarContentView: View {
 
             if let usage = appState.usageByAccountID[account.id], usage.error == nil {
                 usageBarLine(
-                    title: "5h",
+                    title: "5hr",
                     usedPercent: Int(min(max(usage.primaryUsedPercent, 0), 100)),
                     resetAt: usage.primaryResetsAt,
                     tint: usageColor(forUsedPercent: usage.primaryUsedPercent)
                 )
-                .padding(.bottom, 10)
 
                 usageBarLine(
-                    title: "2 weeks",
+                    title: "Week",
                     usedPercent: Int(min(max(usage.secondaryUsedPercent, 0), 100)),
                     resetAt: usage.secondaryResetsAt,
                     tint: usageColor(forUsedPercent: usage.secondaryUsedPercent)
@@ -214,34 +272,34 @@ struct MenuBarContentView: View {
                 }
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
     private func usageBarLine(title: String, usedPercent: Int, resetAt: Date, tint: Color) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            HStack(spacing: 0) {
+            HStack(spacing: 6) {
+                Image(systemName: title == "Week" ? "calendar" : "clock")
+                    .font(.caption)
+                    .foregroundColor(tint)
                 Text(title)
-                    .font(.subheadline.weight(.bold))
-                    .foregroundColor(labelColor)
-            }
-
-            ProgressView(value: Double(usedPercent), total: 100)
-                .progressViewStyle(.linear)
-                .tint(tint)
-
-            HStack(spacing: 8) {
-                Text("\(usedPercent)% used")
                     .font(.caption.weight(.semibold))
                     .foregroundColor(labelColor)
+                Text("\(usedPercent)% used")
+                    .font(.caption)
+                    .foregroundColor(secondaryColor)
                     .monospacedDigit()
                 Spacer(minLength: 0)
                 Text("Resets in \(relativeResetText(to: resetAt))")
                     .font(.caption)
                     .foregroundColor(secondaryColor)
             }
+
+            ProgressView(value: Double(usedPercent), total: 100)
+                .progressViewStyle(.linear)
+                .tint(tint)
         }
     }
 

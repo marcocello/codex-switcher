@@ -36,7 +36,7 @@ final class StatusBarController: NSObject {
     private func configurePopover() {
         popover.behavior = .transient
         popover.animates = true
-        popover.contentSize = NSSize(width: 280, height: 580)
+        popover.contentSize = NSSize(width: 260, height: 490)
         popover.contentViewController = NSHostingController(
             rootView: MenuBarContentView(
                 appState: appState,
